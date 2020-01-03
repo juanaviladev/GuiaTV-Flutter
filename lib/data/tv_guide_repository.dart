@@ -63,7 +63,7 @@ class TvGuideRepository {
       var img =
           doc.querySelector('.ee-info .cover img')?.attributes['src'] ?? "";
       var title = doc.querySelector('.title-especial .h-epsilon').text;
-      var subtitle = doc.querySelector('.title-especial .h-gamma').text;
+      var subtitle = doc.querySelector('.title-especial .h-gamma')?.text ?? "";
       var genre = doc.querySelector('p[itemprop="genre"]').text;
       var rating =
           double.parse(doc.querySelector('div.rating-value span.rating').text);
@@ -104,7 +104,10 @@ Future<ChannelSchedule> parseHTML(
   TvChannel channel = c == null ? _defaultChannel(doc) : c;
 
   var programsFutures = elements.map((el) async {
-    var moreInfo = el.querySelector('a.j_ficha').attributes['href'];
+    var moreInfoElem = el.querySelector('a.j_ficha')?.attributes;
+    if (moreInfoElem == null) return null;
+
+    var moreInfo = moreInfoElem['href'];
     var moreInfoUri = Uri.parse(moreInfo);
     var id = moreInfoUri.queryParameters['id'];
     var type = moreInfoUri.queryParameters['type'];
@@ -113,7 +116,13 @@ Future<ChannelSchedule> parseHTML(
 
     var moreInfoDoc = parse(utf8.decode(moreInfoPage.bodyBytes));
 
-    var imgUrl = moreInfoDoc.querySelector('div.ee-info img').attributes['src'];
+    var imgUrlElem = moreInfoDoc.querySelector('div.ee-info img')?.attributes;
+    var imgUrl;
+    if (imgUrlElem != null) {
+      imgUrl = imgUrlElem['src'];
+    } else {
+      imgUrl = "";
+    }
 
     var title = el.querySelector('li.title').text.trim();
     var genre = el.querySelector('li.genre').text.trim();
@@ -123,7 +132,7 @@ Future<ChannelSchedule> parseHTML(
             .querySelector('div.ee-duration .time')
             ?.text
             ?.replaceAll("'", "") ??
-        '0';
+        '0:00';
     var durationSplitted = duration.split(":");
     var parsedDuration = Duration(
         hours: int.parse(durationSplitted[0]),
@@ -176,9 +185,10 @@ Future<ChannelSchedule> parseHTML(
         isLiveNow: isLiveNow,
         progress: progress,
         fav: false);
-  }).toList();
+  });
 
-  var programs = await Future.wait(programsFutures);
+  var programs =
+      (await Future.wait(programsFutures)).where((x) => x != null).toList();
 
   return ChannelSchedule(channel, programs);
 }

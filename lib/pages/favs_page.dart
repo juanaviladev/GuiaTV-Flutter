@@ -95,7 +95,7 @@ class _FavsPageState extends State<FavsPage> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      "Have you checked any program?",
+                      "Vaya, parece que no hay nada",
                       style: Theme.of(context).textTheme.title,
                     ),
                   )

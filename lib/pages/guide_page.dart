@@ -118,14 +118,38 @@ class _GuidePageState extends State<GuidePage> {
                       snap.data.status == Status.DONE) {
                     var schedule = snap.data.data;
                     var items = schedule.programs;
-                    view = ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: items.length,
-                        itemBuilder: (ctx, i) {
-                          final item = items[i];
-                          return _programItemView(item, schedule.channel);
-                        });
+                    if (items.isNotEmpty) {
+                      view = ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: items.length,
+                          itemBuilder: (ctx, i) {
+                            final item = items[i];
+                            return _programItemView(item, schedule.channel);
+                          });
+                    } else {
+                      view = Container(
+                        height: orientation == Orientation.portrait
+                            ? MediaQuery.of(context).size.longestSide * 0.6
+                            : MediaQuery.of(context).size.shortestSide * 0.5,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Image.asset(
+                                  'res/images/empty_placeholder.png'),
+                            ),
+                            Flexible(
+                              child: Text(
+                                "Vaya, parece que no hay nada",
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.title,
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    }
                   } else if (snap.hasData &&
                       snap.data.status == Status.FAILED) {
                     view = Container(
@@ -141,7 +165,7 @@ class _GuidePageState extends State<GuidePage> {
                           ),
                           Flexible(
                             child: Text(
-                              "Sorry, there's nothing here",
+                              "Vaya, parece que no hay nada",
                               textAlign: TextAlign.center,
                               style: Theme.of(context).textTheme.title,
                             ),
@@ -319,9 +343,9 @@ class _GuidePageState extends State<GuidePage> {
   _onUnfaved(Program program) {
     Scaffold.of(context).showSnackBar(SnackBar(
       duration: Duration(seconds: 2),
-      content: Text('💔 ${program.title} removed from favourites'),
+      content: Text("💔 '${program.title}' ha sido eliminado"),
       action: SnackBarAction(
-        label: 'Undo',
+        label: 'Deshacer',
         onPressed: () {
           widget.scheduleViewModel.fav(program);
         },

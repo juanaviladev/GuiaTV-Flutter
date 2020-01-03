@@ -114,7 +114,8 @@ class ScheduleViewModel {
           await repository.tvGuideBy(_selectedDate, this._selectedChannel);
       _schedule = schedule;
       _scheduleController.add(Task(data: schedule, status: Status.DONE));
-    } catch (e) {
+    } catch (e, strace) {
+      print(strace);
       _scheduleController.add(Task(data: null, status: Status.FAILED));
     }
   }
