@@ -3,9 +3,6 @@ import 'package:flutter/rendering.dart';
 import 'package:guia_tv_flutter/data/tv_guide_repository.dart';
 import 'package:guia_tv_flutter/models/program.dart';
 
-import '../models/tv_channel.dart';
-import 'video_page.dart';
-
 class ProgramDetailView extends StatelessWidget {
   final Program p;
   final repo = new TvGuideRepository();
@@ -55,39 +52,18 @@ class ProgramDetailView extends StatelessWidget {
                       children: <Widget>[
                         Row(
                           children: [
-                            GestureDetector(
-                              onTap: () {
-                                _showDialog(p, p.channel, ctx);
-                              },
-                              child: Card(
-                                child: Stack(
-                                  children: [
-                                    FadeInImage(
-                                      height: 200,
-                                      fit: BoxFit.cover,
-                                      placeholder: AssetImage(
-                                          'res/images/image_spinner.gif'),
-                                      image: NetworkImage(pd.imgUrl),
-                                    ),
-                                    p.isLiveNow &&
-                                            p.channel.streamOpts.isNotEmpty
-                                        ? Positioned.directional(
-                                            end: 0,
-                                            bottom: 0,
-                                            textDirection: TextDirection.ltr,
-                                            child: Image.asset(
-                                              'res/images/play.gif',
-                                              height: 40,
-                                            ),
-                                          )
-                                        : Container()
-                                  ],
-                                ),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12)),
-                                clipBehavior: Clip.antiAliasWithSaveLayer,
-                                elevation: 8,
+                            Card(
+                              child: FadeInImage(
+                                height: 200,
+                                fit: BoxFit.cover,
+                                placeholder:
+                                    AssetImage('res/images/image_spinner.gif'),
+                                image: NetworkImage(pd.imgUrl),
                               ),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12)),
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              elevation: 8,
                             ),
                             Expanded(
                               child: Column(
@@ -131,26 +107,5 @@ class ProgramDetailView extends StatelessWidget {
             ],
           );
         });
-  }
-
-  void _showDialog(Program item, TvChannel c, BuildContext ctx) {
-    showDialog(
-        context: ctx,
-        child: SimpleDialog(
-          title: Text("Seleccione un stream: "),
-          children: _streamingOptsOf(c, ctx),
-        ));
-  }
-
-  _streamingOptsOf(TvChannel c, BuildContext ctx) {
-    return c.streamOpts.map((opt) {
-      return SimpleDialogOption(
-        child: Text(opt.format),
-        onPressed: () {
-          Navigator.of(ctx).push(
-              MaterialPageRoute(builder: (context) => VideoPage(url: opt.url)));
-        },
-      );
-    }).toList();
   }
 }

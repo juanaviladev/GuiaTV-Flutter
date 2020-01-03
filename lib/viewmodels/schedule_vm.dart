@@ -62,6 +62,13 @@ class ScheduleViewModel {
     fp.fav = true;
     _favs.add(fp);
     _favsController.add(_favs);
+
+    final j = _schedule.programs.indexWhere((p) => p.id == fp.id);
+    if (j >= 0) {
+      _schedule.programs[j].fav = true;
+      print(_schedule.hashCode);
+      _scheduleController.add(Task(data: _schedule, status: Status.DONE));
+    }
   }
 
   /*

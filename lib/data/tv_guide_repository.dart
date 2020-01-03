@@ -3,9 +3,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:guia_tv_flutter/models/program.dart';
-import 'package:guia_tv_flutter/models/streaming_channel.dart';
-import 'package:guia_tv_flutter/models/streaming_option.dart';
-import 'package:guia_tv_flutter/models/streaming_urls.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
@@ -181,35 +178,9 @@ Future<ChannelSchedule> parseHTML(
         fav: false);
   }).toList();
 
-  var streamingUrlsFuture = fetchStreamingUrls();
-
   var programs = await Future.wait(programsFutures);
-  var streamingUrls = await streamingUrlsFuture;
-
-  var allChannelsStreaming = streamingUrls.countries['Spain'].ambits
-      .map((x) => x.channels)
-      .expand((f) => f)
-      .toList();
-  allChannelsStreaming.forEach(
-      (StreamingChannel c) => c.name = c.name.replaceAll("HD", "").trim());
-
-  Map<String, List<StreamingOption>> channelsStreamingMap = Map.fromIterable(
-      allChannelsStreaming,
-      key: (s) => s.name.toLowerCase(),
-      value: (s) => s.options);
-
-  channel.streamOpts = channelsStreamingMap[channel.name.toLowerCase()] ?? [];
 
   return ChannelSchedule(channel, programs);
-}
-
-Future<StreamingUrls> fetchStreamingUrls() async {
-  var response =
-      await http.get('http://91.121.64.179/tdt_project/output/channels.json');
-  var decodedData = json.decode(utf8.decode(response.bodyBytes));
-
-  var urls = StreamingUrls.fromJson(decodedData);
-  return urls;
 }
 
 _defaultChannel(Document doc) {
@@ -219,7 +190,7 @@ _defaultChannel(Document doc) {
   String logoUrl = it.querySelector('img').attributes['src'];
   String name = it.querySelector('img').attributes['title'];
 
-  return TvChannel.name(url, name, logoUrl, null);
+  return TvChannel.name(url, name, logoUrl);
 }
 
 List<TvChannel> parseChannelsHTML(String body) {
@@ -231,6 +202,6 @@ List<TvChannel> parseChannelsHTML(String body) {
     String logoUrl = it.querySelector('img').attributes['src'];
     String name = it.querySelector('img').attributes['title'];
 
-    return TvChannel.name(url, name, logoUrl, null);
+    return TvChannel.name(url, name, logoUrl);
   }).toList();
 }

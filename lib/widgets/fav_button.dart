@@ -20,7 +20,7 @@ class FavButton extends StatelessWidget {
       color: checked ? pressedColor : color,
       icon: checked ? Icon(Icons.favorite) : Icon(Icons.favorite_border),
       onPressed: () {
-        onPressed(checked);
+        onPressed(!checked);
       },
     );
   }

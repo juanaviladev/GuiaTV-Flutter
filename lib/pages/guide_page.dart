@@ -307,8 +307,8 @@ class _GuidePageState extends State<GuidePage> {
   }
 
   _isLiveNowDot(Program p) {
-    if (p.isLiveNow && p.channel.streamOpts.isNotEmpty) {
-      return Image(image: AssetImage('res/images/play.gif'));
+    if (p.isLiveNow) {
+      return Image(image: AssetImage('res/images/live.gif'));
     } else {
       return Container();
     }
